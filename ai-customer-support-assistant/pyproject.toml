@@ -1,0 +1,63 @@
+[project]
+name = "ai-customer-support-assistant"
+version = "0.1.0"
+description = "AI-driven customer support assistant using Mistral LLM via Ollama"
+authors = [{name = "Your Name", email = "your.email@example.com"}]
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.3",
+    "pydantic-settings>=2.1.0",
+    "sqlalchemy>=2.0.25",
+    "httpx>=0.26.0",
+    "ollama>=0.1.7",
+    "python-json-logger>=2.0.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.4",
+    "pytest-asyncio>=0.23.3",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.1",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    "isort>=5.13.2",
+]
+
+ml = [
+    "scikit-learn>=1.4.0",
+    "sentence-transformers>=2.2.2",
+    "numpy>=1.26.3",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=app --cov-report=term-missing"

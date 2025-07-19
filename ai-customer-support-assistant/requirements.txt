@@ -1,0 +1,27 @@
+# Core dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-dotenv==1.0.0
+pydantic==1.10.13  # Using v1 for stability
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+
+# HTTP Client for Ollama
+httpx==0.26.0
+requests==2.31.0
+
+# Logging
+python-json-logger==2.0.7
+
+# Development tools
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+
+# Optional: Code quality
+black==23.12.1
+flake8==7.0.0
+isort==5.13.2
