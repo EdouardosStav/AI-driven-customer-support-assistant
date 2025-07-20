@@ -1,61 +1,37 @@
 version: '3.8'
 
 services:
-  # Ollama service
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    networks:
-      - app-network
-
-  # Main application
+  # Main application (using host's Ollama)
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: ai-customer-support
     ports:
-      - "8000:8000"
+      - "8001:8000"  # Map to port 8001 on host to avoid conflict
     environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - DATABASE_URL=sqlite:///./customer_support.db
+      - OLLAMA_HOST=http://host.docker.internal:11434  # Use host's Ollama
+      - OLLAMA_MODEL=mistral
+      - DATABASE_URL=sqlite:///./data/customer_support.db
       - LOG_LEVEL=INFO
+      - KNOWLEDGE_BASE_PATH=./data/knowledge_base.md
     volumes:
       - ./logs:/app/logs
       - ./data:/app/data
-      - ./customer_support.db:/app/customer_support.db
-    depends_on:
-      ollama:
-        condition: service_healthy
     restart: unless-stopped
     networks:
       - app-network
-    command: >
-      sh -c "
-        echo 'Waiting for Ollama to be ready...' &&
-        sleep 10 &&
-        echo 'Pulling Mistral model if not exists...' &&
-        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"mistral\"}' &&
-        echo 'Starting application...' &&
-        uvicorn app.main:app --host 0.0.0.0 --port 8000
-      "
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Enable access to host
+    # Run as root to avoid permission issues
+    user: root
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  ollama_data:
