@@ -2,7 +2,12 @@
 Database base configuration with SQLAlchemy.
 """
 
-from sqlalchemy.ext.declarative import declarative_base
+try:
+    # SQLAlchemy 2.x
+    from sqlalchemy.orm import declarative_base
+except ImportError:
+    # SQLAlchemy 1.x fallback
+    from sqlalchemy.ext.declarative import declarative_base
 
 # Create the declarative base for all models
 Base = declarative_base()
